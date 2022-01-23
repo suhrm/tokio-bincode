@@ -27,12 +27,13 @@
 #![deny(missing_docs, missing_debug_implementations)]
 
 use bincode::Config;
-use bytes::{BufMut, BytesMut};
+use bytes::BytesMut;
+use bytes::BufMut;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::io::{self, Read};
 use std::marker::PhantomData;
-use tokio_codec::{Decoder, Encoder};
+use tokio_util::codec::{Decoder, Encoder};
 
 /// Bincode based codec for use with `tokio-codec`
 pub struct BinCodec<T> {
@@ -62,7 +63,6 @@ where
 {
     type Item = T;
     type Error = bincode::Error;
-
     fn decode(&mut self, buf: &mut BytesMut) -> Result<Option<Self::Item>, Self::Error> {
         if !buf.is_empty() {
             let mut reader = Reader::new(&buf[..]);
@@ -75,11 +75,10 @@ where
     }
 }
 
-impl<T> Encoder for BinCodec<T>
+impl<T> Encoder<T> for BinCodec<T>
 where
     T: Serialize,
 {
-    type Item = T;
     type Error = bincode::Error;
 
     fn encode(&mut self, item: T, buf: &mut BytesMut) -> Result<(), Self::Error> {
@@ -128,10 +127,10 @@ mod tests {
     use serde_derive::{Deserialize, Serialize};
     use std::net::SocketAddr;
     use tokio::{
-        codec::Framed,
         net::{TcpListener, TcpStream},
         runtime::current_thread,
     };
+    use tokio_util::codec::Framed;
 
     #[derive(Deserialize, Serialize, Debug, Clone, Eq, PartialEq)]
     enum Mock {

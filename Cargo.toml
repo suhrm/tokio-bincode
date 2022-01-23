@@ -12,9 +12,9 @@ categories = ["network-programming", "asynchronous"]
 edition = "2018"
 
 [dependencies]
-bytes = "0.4"
+bytes = "*"
 bincode = "1.0"
-tokio-codec = "0.1"
+tokio-util = {version = "*", features = ["codec"]}
 serde = "1.0"
 
 [dev-dependencies]
